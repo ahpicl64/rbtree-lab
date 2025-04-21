@@ -30,7 +30,9 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   node->parent = t->nil;
   node->color = red;
 
-  bst_insert(t, node);\
+  // do bst insertion
+  bst_insert(t, node);
+
 
 
   return t->root;
@@ -85,4 +87,38 @@ void bst_insert(rbtree *t, node_t *p){
 
 void rb_insert_fix_up(rbtree *t, node_t *p){
 
+}
+
+void left_rotate(rbtree *t, node_t *parent_node){
+  node_t *child_node = parent_node->right;
+  parent_node->right = child_node->left;
+  if(child_node != t->nil){
+    child_node->left->parent = parent_node;
+  }
+
+  // 기존 부모 노드가 root였는지, 아니라면 기존 부모의 왼쪽 또는 오른쪽 부모인지
+  if(parent_node->parent == t->nil){
+    t->root = child_node;
+  } else if (parent_node == parent_node->parent->left){
+    parent_node->parent->left = child_node;
+  } else {parent_node->parent->right = child_node;}
+  child_node->left = parent_node;
+  parent_node->parent = child_node;
+}
+
+void right_rotate(rbtree *t, node_t *parent_node){
+  node_t *child_node = parent_node->left;
+  parent_node->left = child_node->right;
+  if(child_node != t->nil){
+    child_node->right->parent = parent_node;
+  }
+  
+  // 기존 부모 노드가 root였는지, 아니라면 기존 부모의 왼쪽 또는 오른쪽 부모인지
+  if(parent_node->parent == t->nil){
+    t->root = child_node;
+  } else if (parent_node == parent_node->parent->left){
+    parent_node->parent->left = child_node;
+  } else {parent_node->parent->right = child_node;}
+  child_node->left = parent_node;
+  parent_node->parent = child_node;
 }
