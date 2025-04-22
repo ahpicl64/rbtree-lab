@@ -5,7 +5,7 @@
 rbtree *new_rbtree(void) {
     rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
     // TODO: initialize struct if needed
-    p->nil = malloc(sizeof (node_t));
+    p->nil = malloc(sizeof(node_t));
     p->nil->color = RBTREE_BLACK;
     p->nil->left = p->nil;
     p->nil->right = p->nil;
@@ -73,6 +73,7 @@ void right_rotate(rbtree *t, node_t *parent_node){
     // otherwise update the childe_node pointer to grandparent's left or right 
     if(parent_node->parent == t->nil){
         t->root = child_node;
+        child_node->parent = t->root;
     } else if (parent_node == parent_node->parent->left){
         parent_node->parent->left = child_node;
     } else {parent_node->parent->right = child_node;}
@@ -81,7 +82,7 @@ void right_rotate(rbtree *t, node_t *parent_node){
 }
 
 void rb_insert_fix_up(rbtree *t, node_t *p){
-    while (p->parent->color == RBTREE_RED){
+    while (p->parent->color == RBTREE_RED && p->parent != t->nil){
         if (p->parent == p->parent->parent->left){      // parent's location is grandparent's left side
             // uncle's color is RBTREE_RED (Case 1)
             if (p->parent->parent->right->color == RBTREE_RED){   // recoloring
@@ -92,7 +93,7 @@ void rb_insert_fix_up(rbtree *t, node_t *p){
             } else {  // uncle's color is RBTREE_BLACK
                 if (p == p->parent->right){                 // Tree is L-R pattren (inner case) (Case 2)
                     p = p->parent;
-                    left_rotate(t, p->parent);
+                    left_rotate(t, p);
                     }                                           // Tree is L-L pattren (outer case) (Case 3)
                 p->parent->color = RBTREE_BLACK;
                 p->parent->parent->color = RBTREE_RED;
@@ -107,7 +108,7 @@ void rb_insert_fix_up(rbtree *t, node_t *p){
             } else {  // uncle's color is RBTREE_BLACK
                 if (p == p->parent->left){                 // Tree is L-R pattren (inner case) (Case 2)
                     p = p->parent;
-                    right_rotate(t, p->parent);
+                    right_rotate(t, p);
                 }                                           // Tree is L-L pattren (outer case) (Case 3)
                 p->parent->color = RBTREE_BLACK;
                 p->parent->parent->color = RBTREE_RED;
@@ -115,6 +116,7 @@ void rb_insert_fix_up(rbtree *t, node_t *p){
             }
         }
     }
+    t->root->color = RBTREE_BLACK;
 }
 
 node_t *rbtree_insert(rbtree *t, const key_t key) {
